@@ -37,7 +37,16 @@ module.exports = env => {
       compress: true,
       port: 9000,
       clientLogLevel: "none",
-      quiet: true
+      quiet: true,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:8081',//代理以/api开头的请求地址
+          changeOrigin: true,
+          pathRewrite: {
+            '^/api': ''
+          }
+        }
+      }
     },
     module: {
       loaders: [

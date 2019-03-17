@@ -7,6 +7,7 @@ import Ious from "../page/ious/index.vue";
 import Raise from "../page/raise/index.vue";
 import Mine from "../page/mine/index.vue";
 import Layout from "../components/public/layout.vue";
+import Login from '../page/login/index.vue';
 
 Vue.use(Router)
 
@@ -45,6 +46,11 @@ export default new Router({
                 }
             ]
         },
+        {
+            path: '/login',
+            name: "Login",
+            component: Login,
+        }
         
     ]
 })

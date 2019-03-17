@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.header">
     <span :class="$style.left">
-      <em>注册</em> | <em>登录</em>
+      <em @click="register">注册</em> | <em>登录</em>
     </span>
     <btn :class="$style.btnDownload">APP下载</btn>
   </div>
@@ -24,7 +24,20 @@ export default {
 
   mounted() {},
 
-  methods: {}
+  methods: {
+    async register() {
+      try {
+        const params = {
+          username: '123',
+          password: '456'
+        }
+        const data = await this.$http.post('/api/register', params)
+        console.log(data)
+      } catch (error) {
+        
+      }
+    }
+  }
 }
 
 </script>
