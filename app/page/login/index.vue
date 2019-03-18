@@ -1,21 +1,21 @@
 <template>
-  <Panel :class="$style.panel" title="登录">
+  <Panel :class="$style.panel" :title="title">
     <section :class="$style.login">
-      <h4>登录</h4>
+      <h4>{{title}}</h4>
       <article :class="$style.loginWrapper">
         <div :class="$style.userLogin">
           <div :class="$style.inputContainer">
-            <input v-validate value="ddd" :require="true" @focus="focusAcc" @blur="blurAcc" :class="$style.username" type="text" name="" id="" placeholder="用户名/邮箱/已验证手机" autocomplete="off">
+            <input v-model="userInfo.username" :require="true" @focus="focusAcc" @blur="blurAcc" :class="$style.username" type="text" name="" id="" placeholder="用户名/邮箱/已验证手机" autocomplete="off">
             <i :class="$style.iconClear" v-show="showAccClear"></i>
           </div>
           <div :class="$style.inputContainer">
-            <input @focus="focusPsw" @blur="blurPsw" :class="$style.password" type="text" name="" id="" placeholder="请输入密码" autocomplete="off">
+            <input @focus="focusPsw" v-model="userInfo.password" @blur="blurPsw" :class="$style.password" type="text" name="" id="" placeholder="请输入密码" autocomplete="off">
             <i :class="[$style.iconClear, $style.iconPassword]" v-show="showPswClear"></i>
             <label></label>
             <button>忘记密码</button>
           </div>
         </div>
-        <a href="" id="loginBtn" :class="$style.btn">登录</a>
+        <a href="" id="loginBtn" :class="$style.btn" @click.prevent="login">登录</a>
         <a href="" id="loginOneStep" :class="$style.btnOnestep">一键登录</a>
       </article>
     </section>
@@ -24,11 +24,17 @@
 
 <script>
 import Panel from '../../components/core/panel';
+
 export default {
   data () {
     return {
       showAccClear: false,
-      showPswClear: false
+      showPswClear: false,
+      userInfo: {
+        username: '',
+        password: ''
+      },
+      title: '登录'
     };
   },
 
@@ -38,7 +44,13 @@ export default {
 
   computed: {},
 
-  // mounted: {},
+  mounted() {
+    if(this.$route.query.type == 'register') {
+      this.title = '注册'
+    } else {
+      this.title = '登录'
+    }
+  },
 
   methods: {
     focusAcc() {
@@ -52,6 +64,16 @@ export default {
     },
     blurPsw() {
       this.showPswClear = false;
+    },
+    async login() {
+      try {
+        console.log(this.userInfo)
+        const data = await this.$http.post('/api/register', this.userInfo)
+        localStorage.setItem('token', data.data.token)
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 }

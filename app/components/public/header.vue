@@ -25,17 +25,8 @@ export default {
   mounted() {},
 
   methods: {
-    async register() {
-      try {
-        const params = {
-          username: '123',
-          password: '456'
-        }
-        const data = await this.$http.post('/api/register', params)
-        console.log(data)
-      } catch (error) {
-        
-      }
+    register() {
+      this.$router.push('/login?type=register')
     }
   }
 }
