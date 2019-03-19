@@ -58,7 +58,7 @@ module.exports = env => {
           test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
           loader: 'url-loader',
           options: {
-              limit: 8192,
+              limit: 2048,
               name: '[path][name].[ext]'
           }
         },
@@ -79,9 +79,15 @@ module.exports = env => {
               scss: 'vue-style-loader!css-loader!px2rem-loader?remUnit=40&remPrecision=8!sass-loader'
             }
           }
+        },
+        {
+          test: /\.css$/,
+          loaders: 'style-loader!css-loader!px2rem-loader?remUnit=40&remPrecision=8',
+          include: __dirname
         }, {
           test: /\.scss$/,
-          loader: 'style-loader!css-loader!sass-loader'
+          exclude: /^node_modules$/,
+          loader: 'style-loader!css-loader!sass-loader',
         }
       ]
     },

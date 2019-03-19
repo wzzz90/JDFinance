@@ -2,8 +2,11 @@ import Vue from "vue"
 import App from "./App.vue"
 import router from "./router"
 import ajax from './utils/ajax'
+import MintUI from 'mint-ui'
 import directives from './directives'
 import './css/reset.scss';
+import 'mint-ui/lib/style.css';
+Vue.use(MintUI)
 
 Vue.config.productionTip = false
 Vue.prototype.$http = ajax;

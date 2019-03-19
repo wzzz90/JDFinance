@@ -1,28 +1,27 @@
 <template>
-  <Panel :class="$style.panel" :title="title">
+  <Panel :class="$style.panel" title="注册">
     <section :class="$style.login">
-      <h4>{{title}}</h4>
+      <h4>注册</h4>
       <article :class="$style.loginWrapper">
         <div :class="$style.userLogin">
           <div :class="$style.inputContainer">
-            <input v-model="userInfo.username" :require="true" @focus="focusAcc" @blur="blurAcc" :class="$style.username" type="text" name="" id="" placeholder="用户名/邮箱/已验证手机" autocomplete="off">
-            <i :class="$style.iconClear" v-show="showAccClear"></i>
+            <input v-model="userInfo.username" :require="true" @focus="showAccClear=true" @blur="showAccClear=false" :class="$style.username" type="text" name="" id="" placeholder="邮箱/手机" autocomplete="off">
+            <i :class="$style.iconClear" v-show="showAccClear" @click="clearAcc"></i>
           </div>
           <div :class="$style.inputContainer">
-            <input @focus="focusPsw" v-model="userInfo.password" @blur="blurPsw" :class="$style.password" type="text" name="" id="" placeholder="请输入密码" autocomplete="off">
-            <i :class="[$style.iconClear, $style.iconPassword]" v-show="showPswClear"></i>
-            <label></label>
-            <button>忘记密码</button>
+            <input @focus="showPswClear=true" v-model="userInfo.password" @blur="showPswClear=false" :class="$style.password" type="text" name="" id="" placeholder="请输入密码" autocomplete="off">
+            <i :class="[$style.iconClear, $style.iconPassword]" v-show="showPswClear" @click="clearPsw"></i>
+            <label :class="{'eye': showEye}" @click="showEye=!showEye"></label>
           </div>
         </div>
-        <a href="" id="loginBtn" :class="$style.btn" @click.prevent="login">登录</a>
-        <a href="" id="loginOneStep" :class="$style.btnOnestep">一键登录</a>
+        <a href="" id="loginBtn" :class="$style.btn" @click.prevent="register">注册</a>
       </article>
     </section>
   </Panel>
 </template>
 
 <script>
+import { Toast } from 'mint-ui';
 import Panel from '../../components/core/panel';
 
 export default {
@@ -30,11 +29,11 @@ export default {
     return {
       showAccClear: false,
       showPswClear: false,
+      showEye: false,
       userInfo: {
         username: '',
         password: ''
-      },
-      title: '登录'
+      }
     };
   },
 
@@ -45,32 +44,22 @@ export default {
   computed: {},
 
   mounted() {
-    if(this.$route.query.type == 'register') {
-      this.title = '注册'
-    } else {
-      this.title = '登录'
-    }
   },
 
   methods: {
-    focusAcc() {
-      this.showAccClear = true;
+    clearAcc() {
+      this.userInfo.username = ''
     },
-    blurAcc() {
-      this.showAccClear = false;
+    clearPsw() {
+      this.userInfo.password = ''
     },
-    focusPsw() {
-      this.showPswClear = true;
-    },
-    blurPsw() {
-      this.showPswClear = false;
-    },
-    async login() {
+    async register() {
       try {
-        console.log(this.userInfo)
         const data = await this.$http.post('/api/register', this.userInfo)
-        localStorage.setItem('token', data.data.token)
-        console.log(data)
+          Toast({
+            message: data.msg,
+            iconClass: 'icon icon-success'
+          });
       } catch (error) {
         console.log(error)
       }
@@ -79,10 +68,18 @@ export default {
 }
 
 </script>
+<style lang="scss" scoped>
+
+.eye {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAB5UlEQVR4Ae1YJXQsQRD8zOYzmTD52Hgdjg2zDvp3571J3HkXZloKg40KM1NXOPMyO8fY9V4f7HZX1zC8YDAYDAaDEQ2YmJj4q+t6iaZp7WS9ZItku7Db3714Bx/4hoXopaWl9ySmikwjXND3pTt266shFhxBFz4zM/OOarKOhCxDkC8GDnCBMyjiKWE6mYnk/jRwgjvQ4iso2YFExCn6OX03Uo1m0e8kqtUvMPzGM7y79TmVcBwgR6DEN0tqbpfMOTU19dtdLvgiBrESzmZ/zzCtkkRtVMPfvOVFLDgkrdHqF/HU9DnPkG/T80K891OOInCKeZDbJ2LTNP8T0bpQ65uGYWTKYi4vL1+STxn5jtytA7e/y/BOFgdOcAuFWIcGX7qOSyA8RCK7xYxEdNrMNJ3wsSsEcghxLq/EW5YVTwnPBbJqu5qXihcKYdcSyCH4n0OLN7OOUyAaV/iXeTDnlym4xgV/pzfdp18gyVf4j7hbAPgqCpAv+Pd7U4DVxySqeV42p8vWDtU6IcSsRlIBsD78EQsQBV0oCgZxFEyjEbCQkc+RuJBF/lYiAjZzhbLNHG+nFQca2A69c3hxoHGoDjR8pJT014xAHerBHcz7oHp/XauAC9cq0X+xxVeLDAaDwWAw/IsraH8effh8nP4AAAAASUVORK5CYII=) !important;
+}
+</style>
+
 <style lang='scss' module>
 @import '../../css/element.scss';
 .panel {
   @include panel;
+  height: 100%;
   margin: 0 !important;
   >h4 {
     display: none;
@@ -161,11 +158,11 @@ export default {
           background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABGdBTUEAALGPC/xhBQAAAjBJREFUaAXtVztSwzAQjUl6zkFHPj09FFAARbgAcAVoc4acABigCQX0UOcDDfdIH8e8BWtmk2gTaa1UrGY0ku3V03vPK1mu1ayYA+aAOWAOmAPmgDnwfx3IYqWPRqM9jOkXRbGL9rbT6bzGYvD4yWRymOd5L8uyKep1q9X65s839Xc2BXieE/kD3N9HHUDQuScm6NZwODwD+RfCIkzUftBAFhQtAJOQ8640cH2nETEej08Bco/acGBoOTa7LXejBdTr9RvAzRhktAhyfj6fPwCDk89hBmFHlWgBzWbzDTN0UVUiBOdz5P+FZj1FL2JnD7mI/nIKzIhIu91+cnG8Fcb8kseYRx4b2lcLoAkEQl4RQmwl8sShkoBQEdsin0TAJhFYmAVillOtsvM0L5XKb+APRk6n8vnCblOuE1XOu/lcm0wAAQqp4uaiNpnzDjSpAAJdIyI5eZov+jtAg5SF1gLVpCXpG1jjviPt3WLdQ02b7A0I5HOQUn2xQ8UkESCRx25DRw71sSNERGUBAnlKlS4dKXC+ed6miEoCymP08kdqJc+3KUK9iIk8/QvAXf6RWiHP02DN2xIPgHy8r68SoCHvJk8tIloACByBzAB1wXlcd8tUcVzFVhKBASex/wTRawCLs4eJ1ORJlbQmSmwKCS7RAoA8Zei0xwc7z8ZJIjg2Dxf7GgGXcOodiJ/4Pz4OTRsfAxpLGMD7Qv1AvfLF2T1zwBwwB8wBc8AcMAfMAb8DP94/FJqk3I9tAAAAAElFTkSuQmCC);
         }
         .iconPassword {
-          right: 250px;
+          right: 80px;
         }
         label {
           position: absolute;
-          right: 180px;
+          right: 20px;
           top: 26px;
           width: 48px;
           height: 48px;
@@ -192,6 +189,20 @@ export default {
           border-left: 2px solid #ccc;
           box-shadow: none;
         }
+      }
+      .quickNav {
+        margin-top: 40px;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        >span {
+          color: #999;
+          font-size: 28px;
+          text-align: center;
+        }
+      }
+      .loginType {
+        margin-top: 176px;
       }
     }
   }

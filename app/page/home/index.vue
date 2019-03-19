@@ -24,15 +24,6 @@ export default {
     vMoney,
     vProduct,
     vLife
-  },
-  async mounted() {
-    try {
-      const res = this.$http.post('/api/list');
-      console.log(res)
-    } catch (error) {
-      
-    }
-    
   }
 }
 </script>

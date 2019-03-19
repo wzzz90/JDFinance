@@ -26,7 +26,7 @@ export default {
 
   methods: {
     register() {
-      this.$router.push('/login?type=register')
+      this.$router.push('/register')
     }
   }
 }

@@ -7,7 +7,8 @@ import Ious from "../page/ious/index.vue";
 import Raise from "../page/raise/index.vue";
 import Mine from "../page/mine/index.vue";
 import Layout from "../components/public/layout.vue";
-import Login from '../page/login/index.vue';
+import Login from '../page/auth/login.vue';
+import Register from '../page/auth/register.vue';
 
 Vue.use(Router)
 
@@ -49,6 +50,11 @@ const routes = [
         path: '/login',
         name: "Login",
         component: Login,
+    },
+    {
+        path: '/register',
+        name: 'Register',
+        component: Register
     }
     
 ]

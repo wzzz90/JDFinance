@@ -1,10 +1,15 @@
 import axios from 'axios';
 import router from '../router'
+
+import { Indicator } from 'mint-ui';
+import { Toast } from 'mint-ui';
+
 axios.defaults.baseURL = '/';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 axios.interceptors.request.use(
   config => {
+    Indicator.open();
     const token = localStorage.getItem('token');
     if (token) {
       // Authorization是JWT的认证头部信息
@@ -17,18 +22,20 @@ axios.interceptors.request.use(
   }
 )
 
-// /src/main.js
 axios.interceptors.response.use(
   response => {
-    return response;
+    Indicator.close();
+    return response.data;
   },
   error => {
+    Indicator.close();
+
     if (error.response.status === 401) {
       router.push('/login');
     } else {
-      Vue.prototype.$message.showMessage({
-        type: 'error',
-        content: '系统出现错误'
+      Toast({
+        message: '网络错误',
+        duration: 2000
       });
     }
     return Promise.reject(error);
