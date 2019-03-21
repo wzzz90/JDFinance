@@ -1,5 +1,6 @@
 import axios from 'axios';
 import router from '../router'
+import store from '../store';
 
 import { Indicator } from 'mint-ui';
 import { Toast } from 'mint-ui';
@@ -32,6 +33,7 @@ axios.interceptors.response.use(
 
     if (error.response.status === 401) {
       router.push('/login');
+      store.dispatch('changeLoginAction', false)
     } else {
       Toast({
         message: '网络错误',

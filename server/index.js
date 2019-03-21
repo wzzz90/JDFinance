@@ -73,18 +73,22 @@ router.post('/login', async (ctx, next) => {
   const postData = ctx.request.body;
   
   if(!!postData.username && !!postData.password) {
-    let filterUser = users.filter(item => item.username === postData.username);
-    if(filterUser.length > 0 && filterUser[0].password === postData.password) {
+    let index = users.findIndex(item => item.username === postData.username);
+    if(index > -1 && users[index].password === postData.password) {
       let userToken = {
         username: postData.username
       }
       const token = jwt.sign(userToken, secret, {expiresIn: '1h'})  //token签名 有效期为1小时
+
       ctx.body = {
         code: 200,
         token,
         msg: '成功',
         status: true
       }
+      
+      users[index].token = token;
+      fs.writeFileSync('./static/user.json', JSON.stringify(users));
     } else {
       ctx.body = {
         code: 200,
@@ -101,19 +105,33 @@ router.post('/login', async (ctx, next) => {
   }
 })
 
-router.post('/list', async (ctx, next) => {
-  ctx.body = {
-    code: 200
+router.get('/userInfo', async(ctx, next) => {
+  verifyToken(ctx, ctx.header.authorization);
+  
+  const userInfo = users.find(item => {
+    return item.token === ctx.header.authorization.split(' ')[1]
+  });
+  
+  delete userInfo.password;
+  if(userInfo) {
+    ctx.body = {
+      code: 200,
+      msg:'成功',
+      res: userInfo,
+      status: true
+    }
   }
-  verifyToken(ctx, ctx.header.authorization)
 })
+
 
 async function verifyToken(ctx, token) {
   let payload;
   if(token) {
     payload = await verify(token.split(' ')[1], secret);
+    
     const curTime = new Date().getTime().toString().substr(0,10);
-    if(payload.exp > curTime) {
+
+    if(payload.exp < curTime) {
       ctx.status = 401
       ctx.body = {
         code: 401,
@@ -121,6 +139,8 @@ async function verifyToken(ctx, token) {
         status: false
       }
     }
+    
+    
   } else {
     ctx.status = 401
     ctx.body = {

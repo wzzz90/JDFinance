@@ -1,20 +1,20 @@
 <template>
   <Panel :class="$style.panel" title="注册">
+    <Header></Header>
     <section :class="$style.login">
-      <h4>注册</h4>
+      <!-- <h4>注册</h4> -->
       <article :class="$style.loginWrapper">
         <div :class="$style.userLogin">
           <div :class="$style.inputContainer">
-            <input v-model="userInfo.username" :require="true" @focus="showAccClear=true" @blur="showAccClear=false" :class="$style.username" type="text" name="" id="" placeholder="邮箱/手机" autocomplete="off">
-            <i :class="$style.iconClear" v-show="showAccClear" @click="clearAcc"></i>
+            <input v-model="userInfo.username" :require="true" @focus="showAccClear=true" @blur="showAccClear=false" :class="$style.username" type="text" name=""  placeholder="邮箱/手机" autocomplete="off">
           </div>
           <div :class="$style.inputContainer">
-            <input @focus="showPswClear=true" v-model="userInfo.password" @blur="showPswClear=false" :class="$style.password" type="text" name="" id="" placeholder="请输入密码" autocomplete="off">
-            <i :class="[$style.iconClear, $style.iconPassword]" v-show="showPswClear" @click="clearPsw"></i>
+            <input @focus="showPswClear=true" v-model="userInfo.password" @blur="showPswClear=false" :class="$style.password" :type="!showEye?'password':'text'" name=""  placeholder="请输入密码" autocomplete="off">
             <label :class="{'eye': showEye}" @click="showEye=!showEye"></label>
           </div>
         </div>
         <a href="" id="loginBtn" :class="$style.btn" @click.prevent="register">注册</a>
+        <span @click.prevent="$router.push('/login')" :class="$style.goLogin">已有账号，前往登录</span>
       </article>
     </section>
   </Panel>
@@ -23,12 +23,11 @@
 <script>
 import { Toast } from 'mint-ui';
 import Panel from '../../components/core/panel';
+import Header from '../../components/public/header';
 
 export default {
   data () {
     return {
-      showAccClear: false,
-      showPswClear: false,
       showEye: false,
       userInfo: {
         username: '',
@@ -38,7 +37,8 @@ export default {
   },
 
   components: {
-    Panel
+    Panel,
+    Header
   },
 
   computed: {},
@@ -47,12 +47,6 @@ export default {
   },
 
   methods: {
-    clearAcc() {
-      this.userInfo.username = ''
-    },
-    clearPsw() {
-      this.userInfo.password = ''
-    },
     async register() {
       try {
         const data = await this.$http.post('/api/register', this.userInfo)
@@ -60,6 +54,9 @@ export default {
             message: data.msg,
             iconClass: 'icon icon-success'
           });
+          setTimeout(() => {
+            this.$router.push('/')
+          }, 2000);
       } catch (error) {
         console.log(error)
       }
@@ -68,7 +65,7 @@ export default {
 }
 
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 
 .eye {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAB5UlEQVR4Ae1YJXQsQRD8zOYzmTD52Hgdjg2zDvp3571J3HkXZloKg40KM1NXOPMyO8fY9V4f7HZX1zC8YDAYDAaDEQ2YmJj4q+t6iaZp7WS9ZItku7Db3714Bx/4hoXopaWl9ySmikwjXND3pTt266shFhxBFz4zM/OOarKOhCxDkC8GDnCBMyjiKWE6mYnk/jRwgjvQ4iso2YFExCn6OX03Uo1m0e8kqtUvMPzGM7y79TmVcBwgR6DEN0tqbpfMOTU19dtdLvgiBrESzmZ/zzCtkkRtVMPfvOVFLDgkrdHqF/HU9DnPkG/T80K891OOInCKeZDbJ2LTNP8T0bpQ65uGYWTKYi4vL1+STxn5jtytA7e/y/BOFgdOcAuFWIcGX7qOSyA8RCK7xYxEdNrMNJ3wsSsEcghxLq/EW5YVTwnPBbJqu5qXihcKYdcSyCH4n0OLN7OOUyAaV/iXeTDnlym4xgV/pzfdp18gyVf4j7hbAPgqCpAv+Pd7U4DVxySqeV42p8vWDtU6IcSsRlIBsD78EQsQBV0oCgZxFEyjEbCQkc+RuJBF/lYiAjZzhbLNHG+nFQca2A69c3hxoHGoDjR8pJT014xAHerBHcz7oHp/XauAC9cq0X+xxVeLDAaDwWAw/IsraH8effh8nP4AAAAASUVORK5CYII=) !important;
@@ -81,14 +78,12 @@ export default {
   @include panel;
   height: 100%;
   margin: 0 !important;
-  >h4 {
-    display: none;
-  }
+
   .login {
     padding: 0 50px;
     h4 {
       width: 100%;
-      height: 100px0;
+      height: 100px;
       text-align: center;
       line-height: 100px;
     }
@@ -146,20 +141,6 @@ export default {
         .password {
           padding: 0 300px 0 0;
         }
-        .iconClear {
-          width: 48px;
-          height: 48px;
-          overflow: hidden;
-          position: absolute;
-          background-repeat: no-repeat;
-          background-size: 100% auto;
-          top: 26px;
-          right: 0;
-          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABGdBTUEAALGPC/xhBQAAAjBJREFUaAXtVztSwzAQjUl6zkFHPj09FFAARbgAcAVoc4acABigCQX0UOcDDfdIH8e8BWtmk2gTaa1UrGY0ku3V03vPK1mu1ayYA+aAOWAOmAPmgDnwfx3IYqWPRqM9jOkXRbGL9rbT6bzGYvD4yWRymOd5L8uyKep1q9X65s839Xc2BXieE/kD3N9HHUDQuScm6NZwODwD+RfCIkzUftBAFhQtAJOQ8640cH2nETEej08Bco/acGBoOTa7LXejBdTr9RvAzRhktAhyfj6fPwCDk89hBmFHlWgBzWbzDTN0UVUiBOdz5P+FZj1FL2JnD7mI/nIKzIhIu91+cnG8Fcb8kseYRx4b2lcLoAkEQl4RQmwl8sShkoBQEdsin0TAJhFYmAVillOtsvM0L5XKb+APRk6n8vnCblOuE1XOu/lcm0wAAQqp4uaiNpnzDjSpAAJdIyI5eZov+jtAg5SF1gLVpCXpG1jjviPt3WLdQ02b7A0I5HOQUn2xQ8UkESCRx25DRw71sSNERGUBAnlKlS4dKXC+ed6miEoCymP08kdqJc+3KUK9iIk8/QvAXf6RWiHP02DN2xIPgHy8r68SoCHvJk8tIloACByBzAB1wXlcd8tUcVzFVhKBASex/wTRawCLs4eJ1ORJlbQmSmwKCS7RAoA8Zei0xwc7z8ZJIjg2Dxf7GgGXcOodiJ/4Pz4OTRsfAxpLGMD7Qv1AvfLF2T1zwBwwB8wBc8AcMAfMAb8DP94/FJqk3I9tAAAAAElFTkSuQmCC);
-        }
-        .iconPassword {
-          right: 80px;
-        }
         label {
           position: absolute;
           right: 20px;
@@ -203,6 +184,13 @@ export default {
       }
       .loginType {
         margin-top: 176px;
+      }
+      .goLogin {
+        display: inline-block;
+        margin-top: 40px;
+        color: #999;
+        font-size: 28px;
+        text-align: center;
       }
     }
   }

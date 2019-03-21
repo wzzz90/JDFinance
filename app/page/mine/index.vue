@@ -4,8 +4,8 @@
       <div :class="$style.userinfo">
         <img :class="$style.avator" src="https://img12.360buyimg.com/jrpmobile/jfs/t2644/238/1420176553/1442/96e2885/573d96deN06201af5.png" alt="">
         <div :class="$style.info">
-          <div :class="$style.name"></div>
-          <span :class="$style.userPin"></span>
+          <div :class="$style.name">{{userInfo.username}}</div>
+          <span :class="$style.userPin">{{userInfo.id}}</span>
         </div>
         <div :class="$style.right">
           <span>会员福利 > </span>
@@ -27,6 +27,7 @@ import Panel from '../../components/core/panel';
 export default {
   data () {
     return {
+      userInfo: {},
       items: [{
         src: '//img12.360buyimg.com/jrpmobile/jfs/t8971/199/1863233880/2035/56d04776/59cb5fbdNa7c682c3.png?width=70&height=70',
         title: '我的资产',
@@ -77,10 +78,21 @@ export default {
     Panel
   },
   mounted() {
-    document.querySelector('#footer').style.cssText="display:none"
+    document.querySelector('#footer').style.cssText="display:none";
+    this.getUserInfo();
   },
   destroyed() {
     document.querySelector('#footer').style.cssText="display:block"
+  },
+  methods: {
+    async getUserInfo() {
+      try {
+        const data = await this.$http.get('/api/userInfo');
+        this.userInfo = data.res;
+      } catch (error) {
+        console.log(error);
+      }
+    }
   }
 }
 
