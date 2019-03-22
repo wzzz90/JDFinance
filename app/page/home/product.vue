@@ -13,6 +13,12 @@ import Slider from '../../components/core/slider';
 
 export default {
   name: '',
+  props: {
+    productData:{
+      type:Array,
+      default: []
+    }
+  },
   data () {
     return {
       items: [{
@@ -42,6 +48,11 @@ export default {
   components: {
     Panel,
     Slider
+  },
+  watch: {
+    productData(val, oldval) {
+      this.items = val
+    }
   }
 }
 

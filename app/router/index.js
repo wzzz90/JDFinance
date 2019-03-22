@@ -10,7 +10,6 @@ import Mine from "../page/mine/index.vue";
 import Layout from "../components/public/layout.vue";
 import Login from '../page/auth/login.vue';
 import Register from '../page/auth/register.vue';
-import Auth from '../page/auth/auth.vue';
 
 Vue.use(Router)
 
@@ -57,11 +56,6 @@ const routes = [
         path: '/register',
         name: 'Register',
         component: Register
-    },
-    {
-        path: '/auth',
-        name: 'Auth',
-        component: Auth
     }
     
 ]

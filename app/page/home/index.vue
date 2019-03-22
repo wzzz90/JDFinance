@@ -1,10 +1,10 @@
 <template lang="html">
     <div>
-      <hSlider></hSlider>
+      <hSlider :sliderData="sliderData"></hSlider>
       <vNovice></vNovice>
       <vBorrow></vBorrow>
       <vMoney></vMoney>
-      <vProduct></vProduct>
+      <vProduct :productData="productData"></vProduct>
       <vLife></vLife>
     </div>
 </template>
@@ -24,7 +24,24 @@ export default {
     vMoney,
     vProduct,
     vLife
-  }
+  },
+  data() {
+    return {
+      sliderData:[],
+      productData: []
+    }
+  },
+  async mounted() {
+    try {
+      const res = await this.$http.get('/api/home');
+
+      this.sliderData = res.res.slice(0,3);
+      this.productData = res.res.slice(-3);
+      
+    } catch (error) {
+      console.log(error)
+    }
+  },
 }
 </script>
 

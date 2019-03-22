@@ -31,8 +31,6 @@ export default {
   },
   methods: {
     dispatchEvent (eventName, params) {
-      // if ()
-      // this.form.$emit
       if (typeof this.form !== 'object' && !this.form.$emit) {
         console.error('FormItem必须在Form组件内')
         return
@@ -62,27 +60,29 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-  .form-item {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    padding: 0 20px;
-    height: 52px;
-    border-bottom: 1px solid #999999;
-    .form-item-label {
-      width: 80px;
-    }
-    .form-item-content {
-      flex: 1;
-      input {
-        display: block;
-        width: 100%;
-        line-height: 26px;
-        background-color: transparent;
-      }
+.form-item {
+  position: relative;
+  .form-item-content {
+    height: 100px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    position: relative;
+    margin-top: 40px;
+    background: #fff;
+    border-bottom: 2px solid #efefef;
+    box-sizing: border-box;
+    .form-item-error {
+      position: absolute;
+      font-size: 32px;
+      left: 0;
+      top: -20px;
+      color: #e71d36;
     }
   }
+    
+}
 
 </style>
+
 
 

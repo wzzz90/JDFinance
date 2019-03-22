@@ -7,6 +7,7 @@ const util = require('util');
 const verify = util.promisify(jwt.verify);//解密
 const secret = 'jdfinance timer';
 const fs = require('fs');
+const crawler = require('./crawler');
 
 const app = new Koa();
 const router = new Router();
@@ -21,7 +22,7 @@ let users = fs.existsSync('./static/user.json') ? JSON.parse(fs.readFileSync('./
 
 router.post('/register', async (ctx, next) => {
   const postData = ctx.request.body;
-  console.log(users)
+  
   if(!!postData.username && !!postData.password) {
     if(users.length > 0) {
       let filterUser = users.some(item => item.username === postData.username);
@@ -74,25 +75,34 @@ router.post('/login', async (ctx, next) => {
   
   if(!!postData.username && !!postData.password) {
     let index = users.findIndex(item => item.username === postData.username);
-    if(index > -1 && users[index].password === postData.password) {
-      let userToken = {
-        username: postData.username
+    if(index > -1) {
+      if(users[index].password === postData.password) {
+        let userToken = {
+          username: postData.username
+        }
+        const token = jwt.sign(userToken, secret, {expiresIn: '1h'})  //token签名 有效期为1小时
+  
+        ctx.body = {
+          code: 200,
+          token,
+          msg: '成功',
+          status: true
+        }
+        
+        users[index].token = token;
+        fs.writeFileSync('./static/user.json', JSON.stringify(users));
+      } else {
+        ctx.body = {
+          code: 200,
+          msg: '用户名或者密码错误',
+          status: false
+        }
       }
-      const token = jwt.sign(userToken, secret, {expiresIn: '1h'})  //token签名 有效期为1小时
 
-      ctx.body = {
-        code: 200,
-        token,
-        msg: '成功',
-        status: true
-      }
-      
-      users[index].token = token;
-      fs.writeFileSync('./static/user.json', JSON.stringify(users));
     } else {
       ctx.body = {
         code: 200,
-        msg: '用户名或者密码错误',
+        msg: '该用户未注册',
         status: false
       }
     }
@@ -113,6 +123,7 @@ router.get('/userInfo', async(ctx, next) => {
   });
   
   delete userInfo.password;
+
   if(userInfo) {
     ctx.body = {
       code: 200,
@@ -122,6 +133,27 @@ router.get('/userInfo', async(ctx, next) => {
     }
   }
 })
+
+router.get('/home', async(ctx, next) => {
+  //爬取数据
+  const data = await crawler();
+  if(data.length > 0) {
+    ctx.body = {
+      code: 200,
+      msg: '成功',
+      status: true,
+      res: data
+    }
+  } else {
+    ctx.body = {
+      code: 200,
+      msg: '失败',
+      status: false
+    }
+  }
+})
+
+
 
 
 async function verifyToken(ctx, token) {

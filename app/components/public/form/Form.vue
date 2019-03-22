@@ -33,8 +33,7 @@ export default {
         }
         descriptor[prop] = this.rules[prop];
       })
-      console.log(this.rules)
-      console.log(descriptor)
+      
       return descriptor;
     },
 
@@ -43,8 +42,7 @@ export default {
         data[prop] = this.model[prop]
         return data
       }, {});
-      console.log(this.model)
-      console.log(formData)
+
       return formData;
     }
   },
@@ -63,7 +61,7 @@ export default {
           formError = {}
         }
         this.formError = formError;
-        console.log(this.formError)
+        
         // 让错误信息的顺序与表单组件的顺序相同
         const errInfo = [];
 
@@ -72,7 +70,6 @@ export default {
             errInfo.push(formError[prop])
           }
         });
-        console.log(errInfo)
 
         callback(errInfo);
       })
@@ -93,4 +90,5 @@ export default {
   }
 }
 </script>
+
 
