@@ -55,7 +55,7 @@
     "node_modules",
     "webpack.config.js"
   ],
-  "homepage": "wzzz90",
+  "homepage": "https://github.com/wzzz90/JDFinance.git",
   "dependencies": {
     "async-validator": "^1.10.1",
     "axios": "^0.18.0",
