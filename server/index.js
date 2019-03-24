@@ -137,7 +137,8 @@ router.get('/userInfo', async(ctx, next) => {
 router.get('/home', async(ctx, next) => {
   //爬取数据
   const data = await crawler();
-  if(data.length > 0) {
+  
+  if(!!data) {
     ctx.body = {
       code: 200,
       msg: '成功',

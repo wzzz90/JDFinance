@@ -3,7 +3,7 @@
       <hSlider :sliderData="sliderData"></hSlider>
       <vNovice></vNovice>
       <vBorrow></vBorrow>
-      <vMoney></vMoney>
+      <vMoney :moneyData="moneyData"></vMoney>
       <vProduct :productData="productData"></vProduct>
       <vLife></vLife>
     </div>
@@ -28,15 +28,17 @@ export default {
   data() {
     return {
       sliderData:[],
-      productData: []
+      productData: [],
+      moneyData: []
     }
   },
   async mounted() {
     try {
       const res = await this.$http.get('/api/home');
 
-      this.sliderData = res.res.slice(0,3);
-      this.productData = res.res.slice(-3);
+      this.sliderData = res.res.slideData.slice(0,3);
+      this.productData = res.res.slideData.slice(-3);
+      this.moneyData = res.res.moneyList
       
     } catch (error) {
       console.log(error)

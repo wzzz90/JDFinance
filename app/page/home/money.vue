@@ -17,6 +17,12 @@ import Panel from '../../components/core/panel';
 
 export default {
   name: '',
+  props: {
+    moneyData:{
+      type:Array,
+      default: []
+    }
+  },
   data () {
     return {
       items: [{
@@ -48,6 +54,11 @@ export default {
 
   components: {
     Panel
+  },
+  watch: {
+    moneyData(val, oldval) {
+      this.items = val
+    }
   }
 }
 
@@ -86,9 +97,10 @@ export default {
         }
       }
       dt {
-        font-size: 30px;
+        font-size: 25.6px;
         line-height: 42px;
         color: #333;
+        font-weight: 700;
         span {
           font-size: 22px;
           color: #ff5155;
@@ -96,6 +108,7 @@ export default {
           padding: 0 8px;
           vertical-align: 1px;
           margin-left: 2px;
+          font-weight: 100;
         }
       }
       dd {

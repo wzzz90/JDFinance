@@ -12,9 +12,10 @@ module.exports = async () => {
   await page.waitFor(2000);
 
   const res = await page.evaluate(() => {
+    let results = {};
     let res = []
     const list = $('#qyy-body>.qyy>.wrap-container>.wrap>.section>.row>.swiper-container>.swiper-wrapper>.swiper-slide');
-    
+
     for (let index = 0; index < list.length; index++) {
       const element = list[index];
       const href = $(element).data('qyy-jumpt');
@@ -41,10 +42,27 @@ module.exports = async () => {
     }
 
     const filterArr = unqiue(res);
-    
-    return filterArr;
-  })
 
+    const itemList = $('#qyy-body>.qyy>.wrap-container>.wrap>.section>.row').find('.licai-sku>.item');
+    
+    let itemArray = [];
+    itemList.forEach(element => {
+      const obj = {
+        href: $(element).data('qyy-jumpt'),
+        title: $(element).find('.title>span').text(),
+        sub: $(element).find('.title>label').text(),
+        rate: $(element).find('.value').text(),
+        text: $(element).find('.desc').text()
+      };
+      itemArray.push(obj)
+    });
+    
+    results.slideData = filterArr;
+    results.moneyList = itemArray;
+
+    return results;
+  })
+  
   await browser.close();
   
   return res;
