@@ -19,7 +19,7 @@
       <a href="" id="loginBtn" :class="$style.btn" @click.prevent="login">登录</a>
       <div :class="$style.quickNav">
         <span>短信验证码登录</span>
-        <span @click="$router.push('/register')">注册</span>
+        <span @click="$router.push('/register')">前往注册</span>
       </div>
       <div :class="$style.loginType"></div>
     </div>

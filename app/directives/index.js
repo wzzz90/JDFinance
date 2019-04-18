@@ -1,8 +1,8 @@
 import Vue from 'vue'
-import validate from './validate.js'
+// import validate from './validate.js'
 
 let directives = [
-  validate
+  // validate
 ]
 
 export default {

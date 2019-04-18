@@ -1,72 +1,113 @@
 <template>
-  <Panel :class="$style.panel" title="注册">
+ <Panel :class="$style.panel" title="登录">
     <Header></Header>
-    <section :class="$style.login">
-      <!-- <h4>注册</h4> -->
-      <article :class="$style.loginWrapper">
-        <div :class="$style.userLogin">
-          <div :class="$style.inputContainer">
-            <input v-model="userInfo.username" :require="true" @focus="showAccClear=true" @blur="showAccClear=false" :class="$style.username" type="text" name=""  placeholder="邮箱/手机" autocomplete="off">
-          </div>
-          <div :class="$style.inputContainer">
-            <input @focus="showPswClear=true" v-model="userInfo.password" @blur="showPswClear=false" :class="$style.password" :type="!showEye?'password':'text'" name=""  placeholder="请输入密码" autocomplete="off">
-            <label :class="{'eye': showEye}" @click="showEye=!showEye"></label>
-          </div>
+    <div :class="$style.formContainer">
+      <v-form :model="userInfo" :rules="rules" ref="form">
+        <div :class="$style.formItemCon">
+          <form-item prop="username">
+            <input  v-model="userInfo.username" @focus="userInfo.password=''" :class="$style.username" type="tel" name="" placeholder="手机号" autocomplete="off"/>
+          </form-item>
         </div>
-        <a href="" id="loginBtn" :class="$style.btn" @click.prevent="register">注册</a>
-        <span @click.prevent="$router.push('/login')" :class="$style.goLogin">已有账号，前往登录</span>
-      </article>
-    </section>
-  </Panel>
+        <div :class="$style.formItemCon">
+          <form-item prop="password">
+            <input v-model="userInfo.password" :class="$style.password" :type="!showEye?'password':'text'" name="" placeholder="请输入密码" autocomplete="off"/>
+          </form-item>
+          <label :class="{'eye': showEye}" @click="showEye=!showEye"></label>
+        </div>
+        <div :class="$style.formItemCon">
+          <form-item prop="passconfirm">
+            <input v-model="userInfo.passconfirm" :class="$style.password" :type="!showEyeC?'password':'text'" name="" placeholder="请再次输入密码" autocomplete="off"/>
+          </form-item>
+          <label :class="{'eye': showEyeC}" @click="showEyeC=!showEyeC"></label>
+        </div>
+      </v-form>
+      <a href="" id="loginBtn" :class="$style.btn" @click.prevent="register">注册</a>
+      <div :class="$style.quickNav">
+        <span>短信验证码注册</span>
+        <span @click="$router.push('/login')">前往登录</span>
+      </div>
+      <div :class="$style.loginType"></div>
+    </div>
+ </Panel>
 </template>
-
 <script>
 import { Toast } from 'mint-ui';
 import Panel from '../../components/core/panel';
 import Header from '../../components/public/header';
+ import { VForm, FormItem } from '../../components/public/form/index';
 
-export default {
+ export default {
   data () {
-    return {
-      showEye: false,
-      userInfo: {
-        username: '',
-        password: ''
+    var validatePass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'));
+      } else if (value !== this.userInfo.password) {
+        callback(new Error('两次输入密码不一致!'));
+      } else {
+        callback();
       }
     };
+   return {
+    showEye: false,
+    showEyeC: false,
+    userInfo: {
+      username: '',
+      password: '',
+      passconfirm: ''
+    },
+    rules: {
+     username: [
+      {required: true, message: '请输入您的手机号码'},
+      {pattern: /^1[34578]\d{9}$/, message: '您的手机号码输入错误'}
+     ],
+     password: [
+       {required: true, message: '请输入您的密码' },
+       { pattern: /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9]{6,16}$/ , message: '密码必须为字母加数字的6-16位' }
+     ],
+     passconfirm: [
+       {required: true, message: '请再次输入密码' },
+       {validator: validatePass}
+     ],
+    }
+   }
   },
-
+  
   components: {
-    Panel,
-    Header
+   VForm,
+   FormItem,
+   Panel,
+   Header
   },
-
-  computed: {},
-
-  mounted() {
-  },
-
   methods: {
-    async register() {
-      try {
-        const data = await this.$http.post('/api/register', this.userInfo)
+   register () {
+     this.$refs.form.validate(async (err) => {
+      if (err.length) {
+        console.error('error submit!!');
+        return false;
+      } else {
+        try {
+          const data = await this.$http.post('/api/register', this.userInfo);
+          
           Toast({
             message: data.msg,
             iconClass: 'icon icon-success'
           });
-          setTimeout(() => {
-            this.$router.push('/')
-          }, 2000);
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  }
-}
+          if(data.status) {
 
+            setTimeout(() => {
+              this.$router.push('/login')
+            }, 2000);
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    });
+   }
+  }
+ }
 </script>
 <style lang="scss">
-
 .eye {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAB5UlEQVR4Ae1YJXQsQRD8zOYzmTD52Hgdjg2zDvp3571J3HkXZloKg40KM1NXOPMyO8fY9V4f7HZX1zC8YDAYDAaDEQ2YmJj4q+t6iaZp7WS9ZItku7Db3714Bx/4hoXopaWl9ySmikwjXND3pTt266shFhxBFz4zM/OOarKOhCxDkC8GDnCBMyjiKWE6mYnk/jRwgjvQ4iso2YFExCn6OX03Uo1m0e8kqtUvMPzGM7y79TmVcBwgR6DEN0tqbpfMOTU19dtdLvgiBrESzmZ/zzCtkkRtVMPfvOVFLDgkrdHqF/HU9DnPkG/T80K891OOInCKeZDbJ2LTNP8T0bpQ65uGYWTKYi4vL1+STxn5jtytA7e/y/BOFgdOcAuFWIcGX7qOSyA8RCK7xYxEdNrMNJ3wsSsEcghxLq/EW5YVTwnPBbJqu5qXihcKYdcSyCH4n0OLN7OOUyAaV/iXeTDnlym4xgV/pzfdp18gyVf4j7hbAPgqCpAv+Pd7U4DVxySqeV42p8vWDtU6IcSsRlIBsD78EQsQBV0oCgZxFEyjEbCQkc+RuJBF/lYiAjZzhbLNHG+nFQca2A69c3hxoHGoDjR8pJT014xAHerBHcz7oHp/XauAC9cq0X+xxVeLDAaDwWAw/IsraH8effh8nP4AAAAASUVORK5CYII=) !important;
 }
@@ -78,17 +119,12 @@ export default {
   @include panel;
   height: 100%;
   margin: 0 !important;
-
-  .login {
+  >h4 {
+    //display: none;
+  }
+  .formContainer {
     padding: 0 50px;
-    h4 {
-      width: 100%;
-      height: 100px;
-      text-align: center;
-      line-height: 100px;
-    }
-    .loginWrapper {
-      >a {
+    a {
         width: 100%;
         height: 100px;
         line-height: 100px;
@@ -101,77 +137,9 @@ export default {
         box-shadow: 0 20px 40px 0 rgba(255,62,62,.2);
         text-align: center;
         font-family: PingFangSC-Semibold;
-      } 
-      .btn {
-        margin-top: 60px;
-      }
-      .btn-onestep {
-        box-sizing: border-box;
-        border: 1px solid #ff2000;
-        color: #f10000;
-        background: #fff;
-        margin-top: 20px;
-      }
-      .input-container {
-        height: 100px;
-        padding-top: 20px;
-        padding-bottom: 20px;
-        position: relative;
-        overflow: hidden;
-        margin-top: 40px;
-        background: #fff;
-        border-bottom: 2px solid #efefef;
-        box-sizing: border-box;
-        &>input {
-          width: 100%;
-          height: 100%;
-          color: #222;
-          box-sizing: border-box;
-          font-family: PingFangSC-Semibold;
-          border: none;
-          font-size: 32px;
-          &::placeholder {
-            // color: #d6d6d6;
-          }
-        }
-        .username {
-          width: 100%;
-          padding: 0 60px 0 0;
-        }
-        .password {
-          padding: 0 300px 0 0;
-        }
-        label {
-          position: absolute;
-          right: 20px;
-          top: 26px;
-          width: 48px;
-          height: 48px;
-          overflow: hidden;
-          z-index: 99;
-          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABGdBTUEAALGPC/xhBQAAAl5JREFUaAXtlE1rE2EQx/PSQIkphQihHhcUklNIcilUihYEDx76FXwBBSt4LkIpiF/ACAq+XPwAPXhoEdoiBHrIC7mYgIUclYIBMYbSuIm/wa5s1s2TtY2IMA/MzjPPzPxn5r/PbiikSxlQBpQBZUAZUAaUAWVAGVAGlAFlQBlQBpSBf8FAeFzRSqUyT8zVSCTyNpfLlcbFT8Jfq9UW+v3+FbA2C4XCngnTOADNFwaDgQBMIXY4HF4G8I0J8LQ+al6j5gY4UeQ7NeepWRmFGxnlOD5fREvzsqIAv4adCz/NyT8FW2pIrWN0qS09jFzGAZh+CzlyZc/atr31N4YQTMGm1qxTT2pLD47tp40D5PP59zBy35NocT9L5XL5ouf8xKZgCSYAlhtEaksP7jPv3vgNOMHcyxeA3XBs0TDT56wYi8VWs9nsN7cv6L5er5/p9XqPwFoBa4hMzl5y92+Owwo0AODRarX6BH3bB/ATxYrxePxpJpP57OP/7ajRaJztdrt3wFvBOecNAO8ZzN9F216f1w40gJPEm1hjv0Zhv7xDCu7i3+aXW0I+sj9AZKW4IueQBfZL5F9CTyNDi/wBB+swvz7kMBh+jRjCQyHexCINPEcm+jei+Q/ILZh/Z2zA4/zjASS/1WpNt9vtBwwhV+DXX8ODHdT8QuPFZDL50LKsw6BJTtyJBnCSm83mTKfTuU4D9xjmvHMeRJOzT87jRCLxKp1Ofw2S4xdzqgHcgHwfMsAScpnGLHSKJlMSgy3fwgF2C72DbHPP99G6lAFlQBlQBpQBZUAZUAaUgf+YgR8RmtPGSJ6MGgAAAABJRU5ErkJggg==);
-          background-repeat: no-repeat;
-          background-size: 100% auto;
-        }
-        button {
-          position: absolute;
-          height: 46px;
-          line-height: 46px;
-          right: 0;
-          top: 25px;
-          background-color: #fff;
-          color: #222;
-          font-size: 28px;
-          border: 0;
-          outline: 0;
-          border-radius: 2px;
-          text-align: center;
-          padding-left: 32px;
-          border-left: 2px solid #ccc;
-          box-shadow: none;
-        }
-      }
-      .quickNav {
+        margin-top:60px;
+    }
+    .quickNav {
         margin-top: 40px;
         text-align: center;
         display: flex;
@@ -185,14 +153,54 @@ export default {
       .loginType {
         margin-top: 176px;
       }
-      .goLogin {
-        display: inline-block;
-        margin-top: 40px;
-        color: #999;
-        font-size: 28px;
-        text-align: center;
-      }
+  }
+  .formItemCon {
+    position: relative;
+    input{
+      width: 100%;
+      height: 100%;
+      color: #222;
+      box-sizing: border-box;
+      font-family: PingFangSC-Semibold;
+      border: none;
+      font-size: 32px;
+    } 
+    .username {
+      width: 100%;
+    }
+    .password {
+      padding: 0 250px 0 0;
+    }
+    label {
+      position: absolute;
+      right: 0;
+      top: 26px;
+      width: 48px;
+      height: 48px;
+      overflow: hidden;
+      z-index: 99;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABGdBTUEAALGPC/xhBQAAAl5JREFUaAXtlE1rE2EQx/PSQIkphQihHhcUklNIcilUihYEDx76FXwBBSt4LkIpiF/ACAq+XPwAPXhoEdoiBHrIC7mYgIUclYIBMYbSuIm/wa5s1s2TtY2IMA/MzjPPzPxn5r/PbiikSxlQBpQBZUAZUAaUAWVAGVAGlAFlQBlQBpSBf8FAeFzRSqUyT8zVSCTyNpfLlcbFT8Jfq9UW+v3+FbA2C4XCngnTOADNFwaDgQBMIXY4HF4G8I0J8LQ+al6j5gY4UeQ7NeepWRmFGxnlOD5fREvzsqIAv4adCz/NyT8FW2pIrWN0qS09jFzGAZh+CzlyZc/atr31N4YQTMGm1qxTT2pLD47tp40D5PP59zBy35NocT9L5XL5ouf8xKZgCSYAlhtEaksP7jPv3vgNOMHcyxeA3XBs0TDT56wYi8VWs9nsN7cv6L5er5/p9XqPwFoBa4hMzl5y92+Owwo0AODRarX6BH3bB/ATxYrxePxpJpP57OP/7ajRaJztdrt3wFvBOecNAO8ZzN9F216f1w40gJPEm1hjv0Zhv7xDCu7i3+aXW0I+sj9AZKW4IueQBfZL5F9CTyNDi/wBB+swvz7kMBh+jRjCQyHexCINPEcm+jei+Q/ILZh/Z2zA4/zjASS/1WpNt9vtBwwhV+DXX8ODHdT8QuPFZDL50LKsw6BJTtyJBnCSm83mTKfTuU4D9xjmvHMeRJOzT87jRCLxKp1Ofw2S4xdzqgHcgHwfMsAScpnGLHSKJlMSgy3fwgF2C72DbHPP99G6lAFlQBlQBpQBZUAZUAaUgf+YgR8RmtPGSJ6MGgAAAABJRU5ErkJggg==);
+      background-repeat: no-repeat;
+      background-size: 100% auto;
+    }
+    button {
+      position: absolute;
+      height: 46px;
+      line-height: 46px;
+      right: 0;
+      top: 25px;
+      background-color: #fff;
+      color: #222;
+      font-size: 28px;
+      border: 0;
+      outline: 0;
+      border-radius: 2px;
+      text-align: center;
+      padding-left: 32px;
+      border-left: 2px solid #ccc;
+      box-shadow: none;
     }
   }
+  
 }
 </style>

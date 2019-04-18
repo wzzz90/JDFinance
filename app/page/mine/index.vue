@@ -17,6 +17,7 @@
         <div :class="[$style.info, $style.common]">{{item.title}}</div>
         <div :class="[$style.benifite, $style.common]">{{!!item.action ? item.action : ''}}</div>
       </div>
+      <div :class="[$style.item, $style.exit]" @click="exit">退出登录</div>
     </section>
   </Panel>
 </template>
@@ -92,6 +93,11 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    exit() {
+      localStorage.removeItem('token');
+      this.$router.push('/login')
+      this.$store.dispatch('changeLoginAction', true);
     }
   }
 }
@@ -158,6 +164,12 @@ export default {
             font-size: 28px;
           }
         }       
+    }
+    .exit {
+      line-height: 112px;
+      text-align: center;
+      font-size: 32px;
+      color: #f04752;
     }
     .item {
       background-color: #fff;
